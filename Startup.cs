@@ -4,6 +4,8 @@ using Microsoft.AspNet.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using OdeToFood.Services;
+using Microsoft.AspNet.Routing;
+using System;
 
 namespace OdeToFood
 {
@@ -21,6 +23,7 @@ namespace OdeToFood
         // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc();
             services.AddSingleton(provider => Configuration);
             services.AddSingleton<IGreeter, Greeter>();
         }
@@ -34,6 +37,8 @@ namespace OdeToFood
             app.UseIISPlatformHandler();
 
             app.UseFileServer();
+
+            app.UseMvc(ConfigureRoute);
 
             if (environment.IsDevelopment())
             {
@@ -51,6 +56,11 @@ namespace OdeToFood
                 var greeting = greeter.GetGreeting();
                 await context.Response.WriteAsync(greeting);
             });
+        }
+
+        private void ConfigureRoute(IRouteBuilder routeBuilder)
+        {
+            routeBuilder.MapRoute("Default", "{controller=Home}/{action=Index}/{id?}");
         }
 
         // Entry point for the application.
